@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Split PDF - Free</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      text-align: center;
+    }
+
+    header {
+      background: white;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .box {
+      max-width: 500px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    input {
+      width: 100%;
+      margin: 25px 0;
+    }
+
+    button {
+      background: #e5322d;
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+
+    .back {
+      display: inline-block;
+      margin-top: 20px;
+      color: #e5322d;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>✂️ Split PDF</h1>
+</header>
+
+<div class="box">
+
+  <h2>Split PDF</h2>
+
+  <p>Ek PDF file select karein.</p>
+
+  <input
+    type="file"
+    id="pdfFile"
+    accept="application/pdf"
+  >
+
+  <br>
+
+  <button id="splitBtn">
+    SPLIT PDF
+  </button>
+
+  <div id="status"></div>
+
+  <a class="back" href="index.html">
+    ← Back to PDF Tools
+  </a>
+
+</div>
+
+<script>
+
+const splitBtn = document.getElementById("splitBtn");
+const pdfFile = document.getElementById("pdfFile");
+const status = document.getElementById("status");
+
+splitBtn.addEventListener("click", async () => {
+
+  if (!pdfFile.files.length) {
+    status.innerText = "❌ Pehle PDF file select karein.";
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append("pdf", pdfFile.files[0]);
+
+  splitBtn.disabled = true;
+  status.innerText = "⏳ PDF split ho raha hai...";
+
+  try {
+
+    const response = await fetch(
+      "https://pdf-to-word-free-1.onrender.com/split",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Split failed");
+    }
+
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "split-pdf.zip";
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+
+    status.innerText =
+      "✅ PDF successfully split ho gaya!";
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.innerText =
+      "❌ PDF split nahi ho paya.";
+
+  }
+
+  splitBtn.disabled = false;
+
+});
+
+</script>
+
+</body>
+</html>
